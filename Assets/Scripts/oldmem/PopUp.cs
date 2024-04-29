@@ -12,7 +12,7 @@ public class PopUp : MonoBehaviour
     {
         window = transform.GetChild(0).gameObject;
         ani = window.GetComponent<Animator>();
-        window.SetActive(false);
+        window.SetActive(true);
     }
 
     public void playPopup()
