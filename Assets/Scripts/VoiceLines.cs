@@ -1,30 +1,52 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class VoiceLines : MonoBehaviour
 {
-    // Reference to the audio clip you want to play
-    public AudioClip voiceLine;
+    public AudioClip[] voiceLines;
 
-    // Reference to the audio source component
+    public float delayBetweenClips = 1.0f;
+
     private AudioSource audioSource;
+
+    private Queue<AudioClip> clipQueue = new Queue<AudioClip>();
 
     private void Start()
     {
-        // Get the AudioSource component attached to this GameObject
-        //audioSource = GetComponent<AudioSource>();
-
-        // Assign the provided AudioClip to the AudioSource component
-        //audioSource.clip = voiceLine;
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        // Check if the GameObject entering the trigger has a "Player" tag
         if (other.CompareTag("Player"))
         {
-            Debug.Log("voiceline");
-            // Play the assigned voiceline
-            //audioSource.Play();
+            clipQueue.Clear();
+
+            if (voiceLines != null && voiceLines.Length > 0)
+            {
+                foreach (AudioClip clip in voiceLines)
+                {
+                    clipQueue.Enqueue(clip);
+                }
+
+                PlayNextClip();
+            }
+        }
+    }
+
+    private void PlayNextClip()
+    {
+        if (clipQueue.Count > 0)
+        {
+            AudioClip nextClip = clipQueue.Dequeue();
+
+            audioSource.clip = nextClip;
+
+            float totalTime = nextClip.length + delayBetweenClips;
+
+            Invoke("PlayNextClip", totalTime);
+
+            audioSource.Play();
         }
     }
 }
